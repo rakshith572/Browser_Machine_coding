@@ -21,7 +21,7 @@ app.get('/log',(req,res)=>{
 
 io.on('connection',(socket)=>{
     start(fileName).then(ele=>{
-        var store=[];
+        var store=ele;
         socket.emit('log-receive',ele);
         fs.watchFile(fileName,{"interval":1000},(curr,prev)=>{
             fs.open(fileName,(err,fd)=>{
@@ -35,9 +35,9 @@ io.on('connection',(socket)=>{
                     const data=buffer.slice(0,bytes).toString().split("\n");
                     const logs=data.slice(1);
                     logs.forEach(element => {
-                        // if(store.length==10){
-                        //     store.shift();
-                        // }
+                        if(store.length==10){
+                            store.shift();
+                        }
                         store.push(element);
                     });
                     eventEmitter.emit('log-update',store);
